@@ -2,10 +2,16 @@ package main
 
 import (
 	// "fmt"
+	"context"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"os"
+
+	// "github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const port = "8080"
@@ -41,4 +47,28 @@ func main() {
 		log.Fatal(serverErr)
 	}
 
+}
+
+func GetDb() (*mongo.Database, error) {
+	opts := options.Client().ApplyURI(atlasConnectionUri)
+
+	client, err := mongo.Connect(context.TODO(), opts)
+
+	if err != nil {
+		log.Fatal(err)
+	} else {
+
+		// check the connection
+		err = client.Ping(context.TODO(), nil)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("DB Connction succeeded!")
+		}
+	}
+
+	db := client.Database("TreasureHunt")
+
+	return db, nil
 }
