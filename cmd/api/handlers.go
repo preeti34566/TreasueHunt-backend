@@ -15,7 +15,7 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request) {
 	}{
 		Status:  "active",
 		Message: "Treasure Hunt API",
-		Version: "1.0.0",
+		Version: "1.1.0",
 	}
 
 	out, err := json.Marshal(payload)

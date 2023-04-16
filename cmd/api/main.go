@@ -1,13 +1,14 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 )
 
-const port = 8080
+const port = "8080"
 
 var atlasConnectionUri string
 
@@ -33,7 +34,8 @@ func main() {
 
 	// starts a web server
 
-	serverErr := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), app.routes())
+	// serverErr := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), app.routes())
+	serverErr := http.ListenAndServe(net.JoinHostPort("0.0.0.0", port), app.routes())
 
 	if serverErr != nil {
 		log.Fatal(serverErr)
