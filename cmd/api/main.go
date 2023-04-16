@@ -11,8 +11,6 @@ import (
 
 const port = 8080
 
-// const atlasConnectionUri := os.Getenv("MONGO_DB")
-
 var atlasConnectionUri string
 
 type application struct {
@@ -28,7 +26,6 @@ func main() {
 	}
 
 	atlasConnectionUri = os.Getenv("MONGO_DB")
-	fmt.Println(atlasConnectionUri)
 
 	var app application
 
