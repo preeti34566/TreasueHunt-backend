@@ -24,11 +24,10 @@ func main() {
 	// }
 
 	atlasConnectionUri = os.Getenv("MONGO_DB")
-	fmt.Println(atlasConnectionUri)
 
 	var app application
 
-	app.Domain = "example.com"
+	app.Domain = "treasureh0nt.onrender.com"
 
 	log.Print("Starting application....")
 
@@ -39,4 +38,5 @@ func main() {
 	if serverErr != nil {
 		log.Fatal(serverErr)
 	}
+
 }
