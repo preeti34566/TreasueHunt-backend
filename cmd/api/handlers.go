@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func (app *application) Home(w http.ResponseWriter, r *http.Request) {
@@ -50,10 +53,6 @@ func (app *application) addUserDetail(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewDecoder(r.Body).Decode(&user)
 
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
 	db, err := GetDb()
 
 	if err != nil {
@@ -67,12 +66,44 @@ func (app *application) addUserDetail(w http.ResponseWriter, r *http.Request) {
 	result, err := collection.InsertOne(context.TODO(), user)
 
 	if err != nil {
-		// log.Fatal(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	jsonResponse, err := json.Marshal(result.InsertedID)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
+
+}
+
+func (app *application) getUserByUserId(w http.ResponseWriter, r *http.Request) {
+
+	// userId := mux.Vars(r)["userId"]
+
+	userId := chi.URLParam(r, "userId")
+
+	db, err := GetDb()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	collection := db.Collection("userDetails")
+
+	// find user detail with userId
+	var user models.Users
+	err = collection.FindOne(context.TODO(), bson.M{"userId": userId}).Decode(&user)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	jsonResponse, err := json.Marshal(user)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
