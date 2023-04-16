@@ -4,17 +4,31 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 const port = 8080
 
-const atlasConnectionUri = "mongodb+srv://anubhav11697:myMongo123@myfirstcluster.hfdwigv.mongodb.net/?retryWrites=true&w=majority"
+// const atlasConnectionUri := os.Getenv("MONGO_DB")
+
+var atlasConnectionUri string
 
 type application struct {
 	Domain string
 }
 
 func main() {
+
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	atlasConnectionUri = os.Getenv("MONGO_DB")
+	fmt.Println(atlasConnectionUri)
 
 	var app application
 
@@ -24,9 +38,9 @@ func main() {
 
 	// starts a web server
 
-	err := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), app.routes())
+	serverErr := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), app.routes())
 
-	if err != nil {
+	if serverErr != nil {
 		log.Fatal(err)
 	}
 }
