@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 const port = 8080
@@ -19,13 +17,14 @@ type application struct {
 
 func main() {
 
-	err := godotenv.Load(".env")
+	// err := godotenv.Load(".env")
 
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 
 	atlasConnectionUri = os.Getenv("MONGO_DB")
+	fmt.Println(atlasConnectionUri)
 
 	var app application
 
@@ -38,6 +37,6 @@ func main() {
 	serverErr := http.ListenAndServe(fmt.Sprintf("localhost:%d", port), app.routes())
 
 	if serverErr != nil {
-		log.Fatal(err)
+		log.Fatal(serverErr)
 	}
 }
