@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 
-	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -24,11 +24,11 @@ type application struct {
 
 func main() {
 
-	// err := godotenv.Load(".env")
+	err := godotenv.Load(".env")
 
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	atlasConnectionUri = os.Getenv("MONGO_DB")
 

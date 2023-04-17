@@ -48,30 +48,44 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) addUserDetail(w http.ResponseWriter, r *http.Request) {
-
 	var user models.Users
 
-	_ = json.NewDecoder(r.Body).Decode(&user)
-
-	db, err := GetDb()
-
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Check if the user ID already exists in the collection
+	db, err := GetDb()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	collection := db.Collection("userDetails")
+	filter := bson.M{"userId": user.UserId}
+	fmt.Println(user.UserId)
+	count, err := collection.CountDocuments(context.Background(), filter)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	// insert user data
+	if count > 0 {
+		// User ID already exists, so do nothing and return
+		http.Error(w, "User ID already exists", http.StatusBadRequest)
+		return
+	}
 
-	result, err := collection.InsertOne(context.TODO(), user)
-
+	// Insert the new user data into the collection
+	result, err := collection.InsertOne(context.Background(), user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	jsonResponse, err := json.Marshal(result.InsertedID)
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -79,12 +93,9 @@ func (app *application) addUserDetail(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
-
 }
 
 func (app *application) getUserByUserId(w http.ResponseWriter, r *http.Request) {
-
-	// userId := mux.Vars(r)["userId"]
 
 	userId := chi.URLParam(r, "userId")
 
@@ -100,7 +111,7 @@ func (app *application) getUserByUserId(w http.ResponseWriter, r *http.Request) 
 	var user models.Users
 	err = collection.FindOne(context.TODO(), bson.M{"userId": userId}).Decode(&user)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 	jsonResponse, err := json.Marshal(user)
